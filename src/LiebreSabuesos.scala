@@ -89,3 +89,16 @@ object TableroClasicoLyS extends TableroJuego:
 def sortearTurno():Jugador=
   if Random.nextBoolean() then Jugador.Liebre
   else Jugador.Sabuesos
+
+case class Estado(
+                 liebre: Posicion,
+                 sabuesos: Set[Posicion]
+                 turno: Jugador
+                 ):
+  def ocupadas: Set[Posicion] = sabuesos + liebre
+  def inicial(tablero: TableroJuego): Estado =
+    Estado(
+      liebre = posicionInicialLiebre,
+      sabuesos = posicionesInicialesSabuesos,
+      turno = sortearTurno(),
+    )
