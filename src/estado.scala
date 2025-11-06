@@ -10,5 +10,5 @@ def sortearturno(): jugador =
 case class estado(
   liebre: posicion,
   sabuesos: set[Posicion],
-                 
+           
                  )
