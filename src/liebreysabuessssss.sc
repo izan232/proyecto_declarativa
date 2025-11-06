@@ -14,24 +14,6 @@ case class Estado(
 def ocupadas: Set[Posicion] = sabuesos + liebre
 
 
-override def pintarTablero(estado: Estado): Unit =
-def pintarNodo(p: Posicion): String =
-val RESET = "\u001B[0m"
-val ROJO = "\u001B[31m"
-val AZUL = "\u001B[34m"
-val BLANCO = "\u001B[37m"
-
-if (estado.liebre == p) s"${ROJO}L${RESET}"
-else if (estado.sabuesos.contains(p)) s"${AZUL}S${RESET}"
-else s"${BLANCO}o${RESET}"
-
-println(s"         ${pintarNodo(I1A)}-----${pintarNodo(MA)}-----${pintarNodo(D1A)}")
-println("      ╱  |  \\  |  /  |  \\")
-println(s"     ${pintarNodo(I2M)}---${pintarNodo(I1M)}-----${pintarNodo(MM)}-----${pintarNodo(D1M)}---${pintarNodo(D2M)}")
-println("      \\  |  /  |  \\  |  /")
-println(s"         ${pintarNodo(I1B)}-----${pintarNodo(MB)}-----${pintarNodo(D1B)}")
-println()
-
 override def esFinPartida(estado: Estado): Option[Jugador] =
   // La liebre gana si alcanza su meta
   if (estado.liebre == posicionMetaLiebre) then Some(Jugador.Liebre)
