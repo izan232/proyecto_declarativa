@@ -85,7 +85,8 @@ object TableroClasicoLyS extends TableroJuego:
     println(s" ${s(I2M)}---${s(I1M)}-----${s(MM)}-----${s(D1M)}---${s(D2M)}")
     println(" \\ | / | \\ | /")
     println(s" ${s(I1B)}-----${s(MB)}-----${s(D1B)}")
-
+  override def esFinPartida(estado: Estado): [option: jugador]
+    if 
 def sortearTurno():Jugador=
   if Random.nextBoolean() then Jugador.Liebre
   else Jugador.Sabuesos
