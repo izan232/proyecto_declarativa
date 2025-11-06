@@ -21,7 +21,8 @@ enum Jugador:
 case class Posicion(col:Columna, fila: Fila):
   def x: Int = col.toInt
   def y: Int = fila.toInt
-
+def manhattan(other: Posicion): Int =
+  Math.abs(this.x - other.x) + Math.abs(this.y - other.y)
 trait TableroJuego:
   def movimientosDesde(p:Posicion): Set[Posicion]
 

@@ -1,36 +1,6 @@
 
 
-/* ==================== ENUMERADOS ====================
-
-enum Fila:
-case A, M, B
-
-def toInt: Int = this match
-case A => 1
-case M => 0
-case B => -1
-
-enum Columna:
-case I2, I1, M, D1, D2
-
-def toInt: Int = this match
-case I2 => -2
-case I1 => -1
-case M => 0
-case D1 => 1
-case D2 => 2
-
-enum Jugador:
-case Liebre, Sabuesos
-
-// ==================== POSICION ====================
-
-case class Posicion(col: Columna, fila: Fila):
-def x: Int = col.toInt
-def y: Int = fila.toInt
-
-def manhattan(other: Posicion): Int =
-  Math.abs(this.x - other.x) + Math.abs(this.y - other.y)
+/*
 
 override def toString: String = s"${col}${fila}"
 
@@ -43,63 +13,6 @@ case class Estado(
                  ):
 def ocupadas: Set[Posicion] = sabuesos + liebre
 
-// ==================== TRAIT TABLERO ====================
-
-trait TableroJuego:
-def movimientosDesde(p: Posicion): Set[Posicion]
-
-def posicionInicialLiebre: Posicion
-def posicionesInicialesSabuesos: Set[Posicion]
-def posicionMetaLiebre: Posicion
-
-def pintarTablero(estado: Estado): Unit
-
-def esFinPartida(estado: Estado): Option[Jugador]
-
-// ==================== TABLERO CLASICO ====================
-
-object TableroClasicoLyS extends TableroJuego:
-
-// Definición de posiciones
-val I1A = Posicion(Columna.I1, Fila.A)
-val MA = Posicion(Columna.M, Fila.A)
-val D1A = Posicion(Columna.D1, Fila.A)
-
-val I2M = Posicion(Columna.I2, Fila.M)
-val I1M = Posicion(Columna.I1, Fila.M)
-val MM = Posicion(Columna.M, Fila.M)
-val D1M = Posicion(Columna.D1, Fila.M)
-val D2M = Posicion(Columna.D2, Fila.M)
-
-val I1B = Posicion(Columna.I1, Fila.B)
-val MB = Posicion(Columna.M, Fila.B)
-val D1B = Posicion(Columna.D1, Fila.B)
-
-// Lista de adyacencias del grafo hexagonal
-private val grafo: Map[Posicion, Set[Posicion]] = Map(
-  I1A -> Set(MA, I1M, MM),
-  MA -> Set(I1A, D1A, I1M, D1M),
-  D1A -> Set(MA, D1M, D2M),
-
-  I2M -> Set(I1M, I1B, MB),
-  I1M -> Set(I1A, I2M, MM, I1B, MB),
-  MM -> Set(I1A, MA, D1A, I1M, D1M, I1B, MB, D1B),
-  D1M -> Set(MA, D1A, MM, D2M, MB, D1B),
-  D2M -> Set(D1A, D1M, D1B),
-
-  I1B -> Set(I2M, I1M, MM, MB),
-  MB -> Set(I2M, I1M, MM, D1M, I1B, D1B),
-  D1B -> Set(MM, D1M, D2M, MB)
-)
-
-override def movimientosDesde(p: Posicion): Set[Posicion] =
-  grafo.getOrElse(p, Set())
-
-override def posicionInicialLiebre: Posicion = D2M
-
-override def posicionesInicialesSabuesos: Set[Posicion] = Set(I2M, I1B, I1A)
-
-override def posicionMetaLiebre: Posicion = I2M
 
 override def pintarTablero(estado: Estado): Unit =
 def pintarNodo(p: Posicion): String =
