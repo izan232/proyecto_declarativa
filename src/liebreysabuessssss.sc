@@ -2,27 +2,6 @@
 
 /*
 
-override def toString: String = s"${col}${fila}"
-
-// ==================== ESTADO ====================
-
-case class Estado(
-                   liebre: Posicion,
-                   sabuesos: Set[Posicion],
-                   turno: Jugador
-                 ):
-def ocupadas: Set[Posicion] = sabuesos + liebre
-
-
-override def esFinPartida(estado: Estado): Option[Jugador] =
-  // La liebre gana si alcanza su meta
-  if (estado.liebre == posicionMetaLiebre) then Some(Jugador.Liebre)
-  // Los sabuesos ganan si la liebre no puede moverse
-  else if (MovimientoLiebre.movimientosPosibles(this, estado).isEmpty) then Some(Jugador.Sabuesos)
-  else None
-
-// ==================== MOVIMIENTOS ====================
-
 sealed trait MovimientoFicha:
 def movimientosPosibles(tablero: TableroJuego, estado: Estado): Set[Posicion]
 

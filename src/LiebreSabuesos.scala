@@ -86,8 +86,10 @@ object TableroClasicoLyS extends TableroJuego:
     println(s" ${s(I2M)}---${s(I1M)}-----${s(MM)}-----${s(D1M)}---${s(D2M)}")
     println(" \\ | / | \\ | /")
     println(s" ${s(I1B)}-----${s(MB)}-----${s(D1B)}")
-  override def esFinPartida(estado: Estado): [option: jugador]
-    if 
+  override def esFinPartida(estado: Estado): Option[Jugador] =
+    if (estado.liebre == posicionMetaLiebre) then Some(Jugador.Liebre)
+    else if (MovimientoLiebre.movimientosPosibles(this, estado).isEmpty) then Some(Jugador.Sabuesos)
+    else None
 def sortearTurno():Jugador=
   if Random.nextBoolean() then Jugador.Liebre
   else Jugador.Sabuesos
@@ -104,3 +106,6 @@ case class Estado(
       sabuesos = posicionesInicialesSabuesos,
       turno = sortearTurno(),
     )
+sealed trait MovimientoFicha:
+  def moviminetosPOsibles(tableroJuego: TableroJuego,estado: Estado):Set[Posicion]
+
