@@ -1,41 +1,4 @@
-
-
 /*
-
-sealed trait MovimientoFicha:
-def movimientosPosibles(tablero: TableroJuego, estado: Estado): Set[Posicion]
-
-case object MovimientoLiebre extends MovimientoFicha:
-override def movimientosPosibles(tablero: TableroJuego, estado: Estado): Set[Posicion] =
-val movimientos = tablero.movimientosDesde(estado.liebre)
-movimientos.filterNot(estado.ocupadas.contains)
-
-def movimientosPosiblesPorSabueso(tablero: TableroJuego, estado: Estado): Set[(Posicion, Posicion)] =
-  for
-    sabueso <- estado.sabuesos
-movimiento <- tablero.movimientosDesde(sabueso)
-if movimiento.x >= sabueso.x
-if !estado.ocupadas.contains(movimiento)
-yield (sabueso, movimiento)
-
-private def rebasaSabueso(liebrePosicion: Posicion, sabueso: Posicion): Boolean =
-  liebrePosicion.x < sabueso.x
-
-private def distanciaSabuesos(tablero: TableroJuego, estado: Estado, liebrePosicion: Posicion): Int =
-  estado.sabuesos.map(s => liebrePosicion.manhattan(s)).sum
-
-private def hasRebasadoAlgun(estado: Estado): Boolean =
-  estado.sabuesos.exists(s => estado.liebre.x < s.x)
-
-def evaluarMovimiento(tablero: TableroJuego, estado: Estado, destino: Posicion): (Int, Int) =
-val sabuesesRebasados = estado.sabuesos.count(s => rebasaSabueso(destino, s))
-val distanciaSabs = distanciaSabuesos(tablero, estado, destino)
-val distanciaAMeta = destino.manhattan(tablero.posicionMetaLiebre)
-
-if hasRebasadoAlgun(estado) then
-  (-distanciaAMeta, distanciaSabs)
-else
-  (sabuesesRebasados, distanciaSabs)
 
 case object MovimientoSabueso extends MovimientoFicha:
 override def movimientosPosibles(tablero: TableroJuego, estado: Estado): Set[Posicion] =
