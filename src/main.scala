@@ -1,4 +1,4 @@
-/*@main def main(): Unit = {
+@main def main(): Unit = {
   println("=== BIENVENIDO AL JUEGO DE LA LIEBRE Y LOS SABUESOS ===\n")
   var seguirJugando = true
 
