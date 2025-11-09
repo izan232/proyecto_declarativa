@@ -100,12 +100,6 @@ case class Estado(
                  turno: Jugador
                  ):
   def ocupadas: Set[Posicion] = sabuesos + liebre
-  def inicial(tablero: TableroJuego): Estado =
-    Estado(
-      liebre = posicionInicialLiebre,
-      sabuesos = posicionesInicialesSabuesos,
-      turno = sortearTurno(),
-    )
 sealed trait MovimientoFicha:
   def moviminetosPosibles(tableroJuego: TableroJuego,estado: Estado):Set[Posicion]
 case object MovimientoLiebre extends MovimientoFicha:
@@ -113,11 +107,11 @@ case object MovimientoLiebre extends MovimientoFicha:
     val movimientos = tablero.movimientosDesde(Estado.liebre)
     movimientos = movimientos - Estado.ocupadas
   }
-private def rebasaSabueso(liebrePosicion: Posicion, sabueso: Posicion): Boolean =
-  liebrePosicion.x < sabueso.x
+  private def rebasaSabueso(liebrePosicion: Posicion, sabueso: Posicion): Boolean =
+    liebrePosicion.x < sabueso.x
 
-private def distanciaSabuesos(tablero: TableroJuego, estado: Estado, liebrePosicion: Posicion): Int =
-  estado.sabuesos.map(s => liebrePosicion.manhattan(s)).sum
+  private def distanciaSabuesos(tablero: TableroJuego, estado: Estado, liebrePosicion: Posicion): Int =
+    estado.sabuesos.map(s => liebrePosicion.manhattan(s)).sum
 
   private def hasRebasadoAlgun(estado: Estado): Boolean =
     estado.sabuesos.exists(s => estado.liebre.x < s.x)
@@ -141,3 +135,71 @@ case object MovimientoSabueso:
       if movimiento.x >= sabueso.x
       if !estado.ocupadas.contains(movimiento)
     yield (sabueso, movimiento)
+  def distaciaALiebre(sabueso: Posicion, liebre:Posicion): Int =
+    sabueso.manhattan(liebre)
+
+  def evaluarMovimiento(tablero:TableroJuego,estado:Estado,sabueso:Posicion,destino:Posicion):(Int,Int)=
+    val distanciaActual= distanciaALiebre(sabueso, estado.liebre)
+    val distanciaNueva= distanciaALiebre(destino,estado.liebre)
+    val mejora =distanciaActual-distanciaNueva
+
+    val posicionIzquierda = -destino.x
+
+    (mejora,posicionIzquierda)
+
+def bucleJuego (tablero:TableroJuego,estado: Estado,modoIA:Set[Jugador]):Jugador=
+  tablero.pintarTablero(estado)
+  println(s"Turno del: ${if estado.turno == Jugador.Liebre then "LIEBRE" else "SABUESOS"}\n")
+
+  estado.turno match
+    case Jugador.Liebre =>
+      val movimientosPosibles = MovimientoLiebre.movimientosPosibles(tablero,estado)
+
+      if (movimientosPosibles.isEmpty) then
+        println("Los sabuesos han ganado")
+        Jugador.Sabuesos
+      else
+        val movimientosOrdenados = movimientosPosibles.toList.map(m=>(m,MovimientoLiebre.evaluarMovimiento(tablero,estado,m))).sortBy{case (_,(v1,v2)=>(-v1,-v2))}
+        movimientosOrdenados.zipWithIndex.foreach {case ((pos,(v1,v2)),idx)=>println(f"$idx: ${pos} - Heurística: ($v1, $v2)")}
+
+        val eleccion = if modoIA.contains(Jugador.Liebre) then
+          val mejor = movimientosOrdenados.head._1
+          print("Elige movimiento")
+        val nuevoEstado = Estado(
+          liebre = movimientosOrdenados(eleccion)._1,
+          sabuesos=estado.sabuesos,
+          turno =Jugaodor.Sabuesos
+        )
+        bucleJuego(tablero,nuevoEstado,modoIA)
+    case Jugador.Sabuesos=>
+      val movimientosPosibles= MovimientoSabueso.movimientosPosibles(tablero,estado)
+    if (movimientosPosibles.isEmpty) then
+      println("La liebre ha ganado")
+      Jugador.Liebre
+    else
+      val movimientosOrdenados = movimientosPosibles.toList.map{case(origen,destino)=>((origen,destino),MovimientoSabueso.evaluarMovimiento(tablero,estado,origen,destino))}.sortBy{case(_,(v1,v2))=>(-v1,-v2)}
+      movimientosOrdenados.zipWithIndex.foreach { case (((origen,destino),(v1,v2)),idx)=>
+        println(f"$idx: $origen -> $destino - Heurística: ($v1, $v2)")
+      }
+      val eleccion = if modoIA.contains(Jugador.Sabuesos) then
+        val mejor = movimientosOrdenados.head._1
+        println(s"IA elige: ${mejor._1} -> ${mejor._2}")
+        movimientosOrdenados.indexWhere(_._1 == mejor)
+      else
+        print("Elige movimiento (0-${movimientosOrdenados.length - 1}): ")
+        StdIn.readLine().toInt
+      val (sabueso, destino) = movimientosOrdenados(eleccion)._1
+      val nuevosSabuesos = (estado.sabuesos - sabueso) + destino
+
+      val nuevoEstado = Estado(
+        liebre = estado.liebre,
+        sabuesos = nuevosSabuesos,
+        turno = Jugador.Liebre
+      )
+      tablero.esFinPartida(nuevoEstado) match
+        case Some(ganador) =>
+          tablero.pintarTablero(nuevoEstado)
+          println(s"¡Los sabuesos han ganado! La liebre está acorralada.")
+          ganador
+        case None =>
+          bucleJuego(tablero, nuevoEstado, modoIA)
